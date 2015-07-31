@@ -87,16 +87,41 @@ DirectedEdge::~DirectedEdge()
 {
 }
 
-PaperConferenceAuthorGraph::PaperConferenceAuthorGraph()
+PaperConferenceAuthorGraph::PaperConferenceAuthorGraph(QObject *parent)
+    :GraphBase(parent)
 {
-    LoadNodes("GraphData/PaperConferenceAuthorGraph/Nodes.txt");
-    LoadEdges("GraphData/PaperConferenceAuthorGraph/Edges.txt");
-
-    ConstructOriginGraph();
+    
+    ConstructScene();
 }
 
 PaperConferenceAuthorGraph::~PaperConferenceAuthorGraph()
 {
+}
+
+void PaperConferenceAuthorGraph::ConstructScene()
+{
+    //InitialLize ExtraInfomation
+    LoadNodes("GraphData/PaperConferenceAuthorGraph/Nodes.txt");
+    LoadEdges("GraphData/PaperConferenceAuthorGraph/Edges.txt");
+
+    //add to scene
+    ConstructOriginGraph();
+    UpDateStrategy("Fast2D");
+
+    for (int i = 0; i < mNodeSize; ++i)
+    {
+        this->addItem(mNodes[i]);
+    }
+    for (int i = 0; i < mEdgeSize; ++i)
+    {
+        int *index = mEdges[i]->GetNodeIndex();
+        QPointF source = mNodes[index[0]]->scenePos();
+        QPointF target = mNodes[index[1]]->scenePos();
+        
+        mEdges[i]->setLine(QLineF(source, target));
+        this->addItem(mEdges[i]);
+    }
+    
 }
 
 void PaperConferenceAuthorGraph::LoadNodes(QString nodeInFileName)
@@ -169,30 +194,31 @@ void PaperConferenceAuthorGraph::LoadNodes(QString nodeInFileName)
 
         if (typeString.at(0) == 'p')
         {
-            PaperNode paperNode(index, nodeId, AcademicNode::Paper, year, viewColor, idString, viewLabel, viewLayout);
-            paperNode.mAuthors = author;
-            paperNode.mDataFrom = dateFrom;
-            paperNode.mPageFrom = pageFrom;
-            paperNode.mPaperTitle = detail;
-            paperNode.mPaperTitleShort = detailShort;
+            PaperNode *paperNode = new PaperNode(index, nodeId, AcademicNode::Paper, year, viewColor, idString, viewLabel, viewLayout);
+            paperNode->mAuthors = author;
+            paperNode->mDataFrom = dateFrom;
+            paperNode->mPageFrom = pageFrom;
+            paperNode->mPaperTitle = detail;
+            paperNode->mPaperTitleShort = detailShort;
 
             
             this->mNodes.push_back(paperNode);
+            tea.push_back(paperNode);
         }
 
         if (typeString.at(0) == 'c')
         {
-            ConferenceNode conferenceNode(index, nodeId, AcademicNode::Paper, year, viewColor, idString, viewLabel, viewLayout);
-            conferenceNode.mConferenceName = detail;
-            conferenceNode.mConferenceNameShort = detailShort;
+            ConferenceNode *conferenceNode= new ConferenceNode(index, nodeId, AcademicNode::Paper, year, viewColor, idString, viewLabel, viewLayout);
+            conferenceNode->mConferenceName = detail;
+            conferenceNode->mConferenceNameShort = detailShort;
             this->mNodes.push_back(conferenceNode);
         }
 
         if (typeString.at(0) == 'a')
         {
-            AuthorNode authorNode(index, nodeId, AcademicNode::Paper, year, viewColor, idString, viewLabel, viewLayout);
-            authorNode.mAuthorName = detail;
-            authorNode.mAuthorNameShort = detail;
+            AuthorNode *authorNode = new AuthorNode(index, nodeId, AcademicNode::Paper, year, viewColor, idString, viewLabel, viewLayout);
+            authorNode->mAuthorName = detail;
+            authorNode->mAuthorNameShort = detail;
             this->mNodes.push_back(authorNode);
         }
         inFile.readLine();
@@ -230,12 +256,12 @@ void PaperConferenceAuthorGraph::LoadEdges(QString edgeInFileName)
             int target;
             source = list[0].toInt();
             target = list[1].toInt();
-            DirectedEdge directedEdge;
-            directedEdge.mEdgeIndex = index;
-            directedEdge.mNodeId[0] = source;
-            directedEdge.mNodeId[1] = target;
-            directedEdge.mNodeIndex[0] = this->mNodeIdHashIndex.value(source);
-            directedEdge.mNodeIndex[1] = this->mNodeIdHashIndex.value(target);
+            DirectedEdge *directedEdge = new DirectedEdge;
+            directedEdge->mEdgeIndex = index;
+            directedEdge->mNodeId[0] = source;
+            directedEdge->mNodeId[1] = target;
+            directedEdge->mNodeIndex[0] = this->mNodeIdHashIndex.value(source);
+            directedEdge->mNodeIndex[1] = this->mNodeIdHashIndex.value(target);
             this->mEdges.push_back(directedEdge);
             //qDebug() << source << "  " << target << endl;
         }
@@ -250,61 +276,7 @@ void PaperConferenceAuthorGraph::SetTestPos()
         randX = rand() % 500;
         randY = rand() % 500;
 
-        this->mNodes[i].mAbsPosition.setX(randX);
-        this->mNodes[i].mAbsPosition.setY(randY);
+        this->mNodes[i]->setX(randX);
+        this->mNodes[i]->setY(randY);
     } 
 }
-
-void PaperConferenceAuthorGraph::ConstructOriginGraph()
-{
-    this->mOriginGraph = vtkSmartPointer<vtkMutableDirectedGraph>::New();
-
-    vector<vtkIdType> vtkNodes;
-    for (vtkIdType i = 0; i < this->mNodeSize; ++i)
-    {
-        vtkIdType aNode = mOriginGraph->AddVertex();
-        vtkNodes.push_back(aNode);
-    }
-
-    for (vtkIdType i = 0; i < this->mEdgeSize; ++i)
-    {
-        int *vtkIndex = this->mEdges[i].GetNodeIndex();
-        mOriginGraph->AddEdge(vtkNodes[vtkIndex[0]],vtkNodes[vtkIndex[1]]);
-    }
-
-    mStoredLayout = vtkSmartPointer<vtkGraphLayout>::New();
-    mStoredLayout->SetInputData(mOriginGraph);
-}
-
-void PaperConferenceAuthorGraph::UpDateStrategy(QString strategyName)
-{
-    if (strategyName == "Circular")
-    {
-        vtkSmartPointer<vtkCircularLayoutStrategy> circularStrategy
-            = vtkSmartPointer<vtkCircularLayoutStrategy>::New();
-        mStoredLayout->SetLayoutStrategy(circularStrategy);
-    }
-    if (strategyName == "ForceDirected")
-    {
-        vtkSmartPointer<vtkForceDirectedLayoutStrategy> forceStrategy
-            = vtkSmartPointer<vtkForceDirectedLayoutStrategy>::New();
-        mStoredLayout->SetLayoutStrategy(forceStrategy);
-    }
-    if (strategyName == "Fast2D")
-    {
-        vtkSmartPointer<vtkFast2DLayoutStrategy> fastStrategy
-            = vtkSmartPointer<vtkFast2DLayoutStrategy>::New();
-        mStoredLayout->SetLayoutStrategy(fastStrategy);
-    }
-
-    mStoredLayout->Update();
-    mOutPutGraph = mStoredLayout->GetOutput();
-    double pos[3];
-    for (int i = 0; i < mNodeSize; ++i)
-    {
-        mOutPutGraph->GetPoint(i, pos);
-        this->mNodes[i].mAbsPosition.setX(pos[0] * 600);
-        this->mNodes[i].mAbsPosition.setY(pos[1] * 600);
-    }
-}
-

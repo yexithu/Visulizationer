@@ -4,7 +4,7 @@
 #include <QWheelEvent>
 #include <QTimeLine>
 class PaperConferenceAuthorGraph;
-class DataScene;
+class GraphDataScene;
 class DataViewer : public QGraphicsView
 {
     Q_OBJECT
@@ -16,7 +16,7 @@ public slots:
     void SetupPaperScene();
     
 private:
-    DataScene *dataScene;
+    PaperConferenceAuthorGraph *paperConferenceAuthorGraph;
 private slots:
     void scalingTime(qreal x);
     void animFinished();

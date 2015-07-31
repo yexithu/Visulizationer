@@ -1,3 +1,5 @@
+/*
+
 #ifndef DATASCENE_H
 #define DATASCENE_H
 
@@ -11,14 +13,14 @@
 #include "graphicsnodeitem.h"
 
 class DataViewer;
-class DataScene: public QGraphicsScene
+class GraphDataScene: public QGraphicsScene
 {
     Q_OBJECT
 public:
     friend class DataViewer;
-    DataScene(QObject *parent = 0);
-    ~DataScene();
-    bool isActivateFlag = true;
+    GraphDataScene(QObject *parent = 0);
+    ~GraphDataScene();
+    bool isActivateFlag;
 private:
     
     QList<GraphicsNodeItem *> mNodeGuis;
@@ -45,4 +47,4 @@ protected:
     
 };
 
-#endif
+#endif*/

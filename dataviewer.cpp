@@ -1,5 +1,6 @@
 #include "dataviewer.h"
-#include "datascene.h"
+#include "GraphDataScene.h"
+#include "paperconferenceauthor.h"
 DataViewer::DataViewer(QWidget *parent)
     :QGraphicsView()
 {
@@ -10,8 +11,7 @@ DataViewer::DataViewer(QWidget *parent)
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    dataScene = new DataScene(this);
-    this->setScene(dataScene);
+    
     //setCursor(Qt::PointingHandCursor);
 }
 
@@ -33,7 +33,7 @@ void DataViewer::wheelEvent(QWheelEvent * event)
     connect(anim, SIGNAL(valueChanged(qreal)), SLOT(scalingTime(qreal)));
     connect(anim, SIGNAL(finished()), SLOT(animFinished()));
     anim->start();
-    QWidget::wheelEvent(event);
+    //QWidget::wheelEvent(event);
 }
 
 void DataViewer::scalingTime(qreal x)
@@ -54,11 +54,12 @@ void DataViewer::animFinished()
 
 void DataViewer::LayoutStrategyChanged(QString layoutName)
 {
-    this->dataScene->mPaperConferenceAuthorGraph->UpDateStrategy(layoutName);
-    dataScene->UpdataAllPosition();
+    this->paperConferenceAuthorGraph->UpDateStrategy(layoutName);
+    
 }
 
 void DataViewer::SetupPaperScene()
 {
-    dataScene->SetUpForPaper();
+    this->paperConferenceAuthorGraph = new PaperConferenceAuthorGraph(this);
+    setScene(paperConferenceAuthorGraph);
 }

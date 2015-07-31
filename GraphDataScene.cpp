@@ -1,10 +1,11 @@
+/*
 
-#include "datascene.h"
+#include "GraphDataScene.h"
 #include "dataviewer.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QDebug>
-DataScene::DataScene(QObject *parent)
+GraphDataScene::GraphDataScene(QObject *parent)
     : QGraphicsScene(parent)
 {
     paintPen.setWidth(0);
@@ -17,12 +18,12 @@ DataScene::DataScene(QObject *parent)
     
 }
 
-DataScene::~DataScene()
+GraphDataScene::~GraphDataScene()
 {
 }
 
 
-void DataScene::ConstructScene()
+void GraphDataScene::ConstructScene()
 {
     int start = clock();
     for (int i = 0; i < mPaperConferenceAuthorGraph->mEdgeSize; ++i)
@@ -50,7 +51,7 @@ void DataScene::ConstructScene()
     
 }
 
-void DataScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void GraphDataScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::MouseButton::LeftButton)
     {
@@ -66,7 +67,7 @@ void DataScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsScene::mousePressEvent(event);
 }
 
-void DataScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void GraphDataScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     //if (event->button() == Qt::MouseButton::LeftButton)
     {
@@ -80,7 +81,7 @@ void DataScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsScene::mouseMoveEvent(event);
 }
 
-void DataScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void GraphDataScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::MouseButton::LeftButton)
     {
@@ -94,7 +95,7 @@ void DataScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsScene::mouseReleaseEvent(event);
 }
 
-void DataScene::UpdataEdgePosition()
+void GraphDataScene::UpdataEdgePosition()
 {
     int start = clock();
     for (int i = 0; i < mEdgeGuis.size(); ++i)
@@ -110,7 +111,7 @@ void DataScene::UpdataEdgePosition()
     qDebug() << "Time" << clock() - start;
 }
 
-void DataScene::updateViewPort()
+void GraphDataScene::updateViewPort()
 {
     QGraphicsView view = this->views()[0];
     QRect viewPort = view.viewport()->rect();
@@ -122,14 +123,14 @@ void DataScene::updateViewPort()
 
 }
 
-void DataScene::SetUpForPaper()
+void GraphDataScene::SetUpForPaper()
 {
     mPaperConferenceAuthorGraph = new PaperConferenceAuthorGraph;
     mPaperConferenceAuthorGraph->UpDateStrategy("Circular");
     ConstructScene();
 }
 
-void DataScene::UpdataAllPosition()
+void GraphDataScene::UpdataAllPosition()
 {
     int start = clock();
     for (int i = 0; i < mEdgeGuis.size(); ++i)
@@ -147,4 +148,4 @@ void DataScene::UpdataAllPosition()
         mNodeGuis[i]->setPos(ellipsCenter);
     }
     this->updateViewPort();
-}
+}*/

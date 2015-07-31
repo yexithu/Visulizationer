@@ -24,7 +24,7 @@
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkCamera.h"
-#include "datascene.h"
+#include "GraphDataScene.h"
 #include "QVTKWidget.h"
 #include "paperconferenceauthor.h"
 
@@ -41,15 +41,6 @@ Visualizationer::~Visualizationer()
 }
 
 
-void Visualizationer::setVTKWidget()
-{
-        
-    // This starts the event loop and as a side effect causes an initial render.
-    
-
-    // Exiting from here, we have to delete all the instances that
-    // have been created.
-}
 
 void Visualizationer::paintEvent(QPaintEvent *pe)
 {

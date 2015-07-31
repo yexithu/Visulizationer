@@ -2,11 +2,10 @@
 #define PAPERCONFERENCEAUTHOR_H
 
 #include "stdafx.h"
-
+#include "nodebase.h"
 #include "graphbase.h"
+#include "edgebase.h"
 #include <vector>
-#include <fstream>
-#include <string>
 #include <QHash>
 #include <QString>
 #include <QDir>
@@ -38,7 +37,6 @@ protected:
         Conference,
         Author
     };
-    int mNodeIndex;
     Type mType;
     int mYear;
     QColor mViewColor;
@@ -95,27 +93,25 @@ public:
 private:
 };
 
+
+
 class PaperConferenceAuthorGraph : public GraphBase
 {
 public:
-    PaperConferenceAuthorGraph();
+    PaperConferenceAuthorGraph(QObject *parent = 0);
     ~PaperConferenceAuthorGraph();
 
 public:
-    vector<AcademicNode> mNodes;
-    vector<DirectedEdge> mEdges;
     QHash<int, int> mNodeIdHashIndex;
+    vector<AcademicNode *> tea;
     void SetTestPos();
-    void UpDateStrategy(QString strategyName);
+    
 private:
-    vtkSmartPointer<vtkMutableDirectedGraph> mOriginGraph;
-    vtkSmartPointer<vtkGraphLayout> mStoredLayout;
-    vtkSmartPointer<vtkGraph> mOutPutGraph;
 
-    void ConstructOriginGraph();
-    void SetPointPosition(int index, QPointF pos);
     void LoadNodes(QString nodeInFileName);
-    void LoadEdges(QString edgeInFileName);    
+    void LoadEdges(QString edgeInFileName);
+protected:
+    virtual void ConstructScene();
 };
 
 #endif

@@ -1,3 +1,12 @@
+/*
+存有信息
+1.Node
+2.Edge
+处理Gui交互
+*/
+
+
+
 #ifndef GRAPHBASE_H
 #define GRAPHBASE_H
 
@@ -5,76 +14,46 @@
 #include <QPoint>
 #include <QString>
 #include <QColor>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+#include <vtkSmartPointer.h>
+#include <vtkMutableDirectedGraph.h>
+#include <vtkGraphLayout.h>
+#include <vtkCircularLayoutStrategy.h>
+#include <vtkForceDirectedLayoutStrategy.h>
+#include <vtkFast2DLayoutStrategy.h>
+
 using namespace std;
-
-class NodeBase
+class NodeBase;
+class EdgeBase;
+class GraphBase : public QGraphicsScene
 {
+    Q_OBJECT
 public:
-    NodeBase();
-    ~NodeBase();
-
-protected:
-    int mNodeId;
-    int mRadius;
-    int mDegree;
-    QPointF mAbsPosition;
-    QColor mNodeColor;
-
-public:
-    inline QPointF GetPoint()
-    {
-        return mAbsPosition;
-    }
-    inline int GetRadius()
-    {
-        return mRadius;
-    }
-    static inline QString GetStem(const QString &origin)
-    {
-        int index = origin.indexOf(':');
-        QString temp = origin.right(origin.length() - index - 2);
-        int mark = 0;
-        return temp;
-    }
-};
-
-
-class EdgeBase
-{
-public:
-    EdgeBase();
-    ~EdgeBase();
-
-    inline int *GetNodeIndex()
-    {
-        return this->mNodeIndex;
-    }
-    inline int *GetNodeId()
-    {
-        return this->mNodeId;
-    }
-protected:
-    //defualt
-    //0 the source 1 the target
-    int mEdgeIndex;
-    int mNodeId[2];
-    int mNodeIndex[2];
-};
-
-
-
-class GraphBase
-{
-public:
-    GraphBase();
+    GraphBase(QObject *parent = 0);
     ~GraphBase();
+    bool isActiveFlag;
+
+    void UpDateStrategy(QString strategyName);
+private:
+    
+protected:
     int mNodeSize;
     int mEdgeSize;
-private:
+    vector<NodeBase *> mNodes;
+    vector<EdgeBase *> mEdges;
+    vtkSmartPointer<vtkMutableDirectedGraph> mOriginGraph;
+    vtkSmartPointer<vtkGraphLayout> mStoredLayout;
+    vtkSmartPointer<vtkGraph> mOutPutGraph;
+    
+    void ConstructOriginGraph();
+    
 
-protected:
+    void UpdateViewPort();
+    virtual void ConstructScene() = 0;
 
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 };
-
-
 #endif

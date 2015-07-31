@@ -1,9 +1,10 @@
 #include "graphicsnodeitem.h"
 #include <QPainter>
 #include <QDebug>
-#include "datascene.h"
-GraphicsNodeItem::GraphicsNodeItem(int index, int radius) :mIndex(index), mRadius(radius)
+#include "GraphDataScene.h"
+GraphicsNodeItem::GraphicsNodeItem()
 {
+    mRadius = 5;
     mPaintColor = QColor(Qt::white);
     this->setFlag(QGraphicsItem::ItemIsMovable, true);
     this->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -31,7 +32,7 @@ QVariant GraphicsNodeItem::itemChange(GraphicsItemChange change, const QVariant 
 {
     if (change == ItemScenePositionHasChanged && scene())
     {
-        qDebug() << "ItemValueChange";
+        //qDebug() << "ItemValueChange";
             // value is the new position.
         QPointF newPos = value.toPointF();
     }

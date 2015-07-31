@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="Visualizationer">
+    <qresource prefix="/QSS">
+        <file>Resources/mainwindow.qss</file>
     </qresource>
 </RCC>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>803</width>
+    <width>800</width>
     <height>547</height>
    </rect>
   </property>
@@ -14,9 +14,62 @@
    <string>Visualizationer</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="DataViewer" name="graphicsView"/>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QComboBox" name="comboBox"/>
+      </item>
+      <item>
+       <widget class="QSlider" name="horizontalSlider">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>GroupBox</string>
+        </property>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>20</y>
+           <width>91</width>
+           <height>40</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QRadioButton" name="selectRadioButton">
+            <property name="text">
+             <string>Select</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="drugRadioButton">
+            <property name="text">
+             <string>Drag</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="DataViewer" name="dataViewer"/>
     </item>
    </layout>
   </widget>
@@ -25,20 +78,38 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>803</width>
+     <width>800</width>
      <height>23</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuLoadData">
+    <property name="title">
+     <string>LoadData</string>
+    </property>
+    <addaction name="actionPaperConferenceAuthor"/>
+    <addaction name="actionTopic"/>
+   </widget>
+   <addaction name="menuLoadData"/>
   </widget>
+  <action name="actionPaperConferenceAuthor">
+   <property name="text">
+    <string>PaperConferenceAuthor</string>
+   </property>
+  </action>
+  <action name="actionTopic">
+   <property name="text">
+    <string>Topic</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
-  <customwidgets>
-    <customwidget>
-      <class>DataViewer</class>
-      <extends>QGraphicsView</extends>
-      <header>dataviewer.h</header>
-    </customwidget>
-  </customwidgets>
+ <customwidgets>
+  <customwidget>
+   <class>DataViewer</class>
+   <extends>QGraphicsView</extends>
+   <header>dataviewer.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="visualizationer.qrc"/>
  </resources>

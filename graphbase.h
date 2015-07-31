@@ -16,8 +16,10 @@ public:
 protected:
     int mNodeId;
     int mRadius;
+    int mDegree;
     QPointF mAbsPosition;
     QColor mNodeColor;
+
 public:
     inline QPointF GetPoint()
     {
@@ -54,6 +56,7 @@ public:
 protected:
     //defualt
     //0 the source 1 the target
+    int mEdgeIndex;
     int mNodeId[2];
     int mNodeIndex[2];
 };

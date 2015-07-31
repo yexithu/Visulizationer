@@ -19,8 +19,15 @@ public:
 
 private:
     Ui::VisualizationerClass ui;
-    DataViewer *dataviewer;
     void setVTKWidget();
+    void SetUiDetai();
+
+    QAction *paperconAction;
+    QAction *topicAction;
+
+private slots:
+    void LoadPaperDataset();
+    void LoadTopicDataset();
 protected:
     void paintEvent(QPaintEvent *pe);
 };

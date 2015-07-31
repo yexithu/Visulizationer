@@ -74,6 +74,9 @@
     <ClCompile Include="GeneratedFiles\qrc_visualizationer.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphicsnodeitem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="visualizationer.h">
@@ -91,6 +94,9 @@
     <CustomBuild Include="datascene.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="graphicsnodeitem.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_visualizationer.h">
@@ -105,5 +111,16 @@
     <ClInclude Include="paperconferenceauthor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Visualizationer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mainwindow.qss">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

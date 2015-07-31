@@ -231,12 +231,13 @@ void PaperConferenceAuthorGraph::LoadEdges(QString edgeInFileName)
             source = list[0].toInt();
             target = list[1].toInt();
             DirectedEdge directedEdge;
+            directedEdge.mEdgeIndex = index;
             directedEdge.mNodeId[0] = source;
             directedEdge.mNodeId[1] = target;
             directedEdge.mNodeIndex[0] = this->mNodeIdHashIndex.value(source);
             directedEdge.mNodeIndex[1] = this->mNodeIdHashIndex.value(target);
             this->mEdges.push_back(directedEdge);
-            qDebug() << source << "  " << target << endl;
+            //qDebug() << source << "  " << target << endl;
         }
     }
 }
@@ -306,3 +307,4 @@ void PaperConferenceAuthorGraph::UpDateStrategy(QString strategyName)
         this->mNodes[i].mAbsPosition.setY(pos[1] * 600);
     }
 }
+

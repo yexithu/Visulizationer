@@ -3,16 +3,20 @@
 #include <QGraphicsView>
 #include <QWheelEvent>
 #include <QTimeLine>
-#include "datascene.h"
+class PaperConferenceAuthorGraph;
+class DataScene;
 class DataViewer : public QGraphicsView
 {
     Q_OBJECT
 public:
     DataViewer(QWidget *parent);
     ~DataViewer();
-
+public slots:
+    void LayoutStrategyChanged(QString layoutName);
+    void SetupPaperScene();
+    
 private:
-    DataScene *scene;
+    DataScene *dataScene;
 private slots:
     void scalingTime(qreal x);
     void animFinished();

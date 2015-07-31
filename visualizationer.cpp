@@ -32,20 +32,7 @@ Visualizationer::Visualizationer(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-/*
-    PaperConferenceAuthorGraph paperConferenceAuthorGraph;
-    dataviewer = new DataViewer;*/
-   
-
-    ui.graphicsView->setRenderHint(QPainter::Antialiasing);
-    QBrush backGround(QColor(15, 15, 15), Qt::BrushStyle::SolidPattern);
-    ui.graphicsView->setBackgroundBrush(backGround);
-    ui.graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui.graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //this->resize(QSize(500, 500));
-    
-    //setVTKWidget();
-
+    SetUiDetai();
 }
 
 Visualizationer::~Visualizationer()
@@ -72,3 +59,28 @@ void Visualizationer::paintEvent(QPaintEvent *pe)
 
     painter.drawRect(0, 0, width(), height());
 }
+
+void Visualizationer::SetUiDetai()
+{
+    ui.comboBox->addItem("Circular");
+    ui.comboBox->addItem("Fast2D");
+    ui.comboBox->addItem("ForceDirected");
+    connect(ui.comboBox, SIGNAL(activated(const QString &)), ui.dataViewer, SLOT(LayoutStrategyChanged(QString)));
+
+
+    connect(this->ui.actionPaperConferenceAuthor, SIGNAL(triggered()), this, SLOT(LoadPaperDataset()));
+    connect(this->ui.actionTopic, SIGNAL(triggered()), this, SLOT(LoadTopicDataset()));
+}
+
+void Visualizationer::LoadPaperDataset()
+{
+    qDebug() << "PaperTrigger";
+    ui.dataViewer->SetupPaperScene();
+
+}
+
+void Visualizationer::LoadTopicDataset()
+{
+    qDebug() << "Topic";
+}
+

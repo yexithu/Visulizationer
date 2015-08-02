@@ -106,12 +106,9 @@ void PaperConferenceAuthorGraph::ConstructScene()
 
     //add to scene
     ConstructOriginGraph();
-    UpDateStrategy("Fast2D");
+    UpDateStrategy("Circular");
 
-    for (int i = 0; i < mNodeSize; ++i)
-    {
-        this->addItem(mNodes[i]);
-    }
+   
     for (int i = 0; i < mEdgeSize; ++i)
     {
         int *index = mEdges[i]->GetNodeIndex();
@@ -120,6 +117,10 @@ void PaperConferenceAuthorGraph::ConstructScene()
         
         mEdges[i]->setLine(QLineF(source, target));
         this->addItem(mEdges[i]);
+    }
+    for (int i = 0; i < mNodeSize; ++i)
+    {
+        this->addItem(mNodes[i]);
     }
     
 }
@@ -200,7 +201,7 @@ void PaperConferenceAuthorGraph::LoadNodes(QString nodeInFileName)
             paperNode->mPageFrom = pageFrom;
             paperNode->mPaperTitle = detail;
             paperNode->mPaperTitleShort = detailShort;
-
+            paperNode->graphBase = this;
             
             this->mNodes.push_back(paperNode);
             tea.push_back(paperNode);
@@ -211,6 +212,7 @@ void PaperConferenceAuthorGraph::LoadNodes(QString nodeInFileName)
             ConferenceNode *conferenceNode= new ConferenceNode(index, nodeId, AcademicNode::Paper, year, viewColor, idString, viewLabel, viewLayout);
             conferenceNode->mConferenceName = detail;
             conferenceNode->mConferenceNameShort = detailShort;
+            conferenceNode->graphBase = this;
             this->mNodes.push_back(conferenceNode);
         }
 
@@ -219,6 +221,7 @@ void PaperConferenceAuthorGraph::LoadNodes(QString nodeInFileName)
             AuthorNode *authorNode = new AuthorNode(index, nodeId, AcademicNode::Paper, year, viewColor, idString, viewLabel, viewLayout);
             authorNode->mAuthorName = detail;
             authorNode->mAuthorNameShort = detail;
+            authorNode->graphBase = this;
             this->mNodes.push_back(authorNode);
         }
         inFile.readLine();
@@ -262,6 +265,11 @@ void PaperConferenceAuthorGraph::LoadEdges(QString edgeInFileName)
             directedEdge->mNodeId[1] = target;
             directedEdge->mNodeIndex[0] = this->mNodeIdHashIndex.value(source);
             directedEdge->mNodeIndex[1] = this->mNodeIdHashIndex.value(target);
+
+            mNodes[directedEdge->mNodeIndex[0]]->mDegree++;
+            mNodes[directedEdge->mNodeIndex[1]]->mDegree++;
+            mNodes[directedEdge->mNodeIndex[0]]->mConnectedEdges.push_back(directedEdge);
+            mNodes[directedEdge->mNodeIndex[1]]->mConnectedEdges.push_back(directedEdge);
             this->mEdges.push_back(directedEdge);
             //qDebug() << source << "  " << target << endl;
         }

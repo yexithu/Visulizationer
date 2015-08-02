@@ -11,12 +11,6 @@
 #include <QDir>
 #include <QFile>
 #include <QColor>
-#include <vtkSmartPointer.h>
-#include <vtkMutableDirectedGraph.h>
-#include <vtkGraphLayout.h>
-#include <vtkCircularLayoutStrategy.h>
-#include <vtkForceDirectedLayoutStrategy.h>
-#include <vtkFast2DLayoutStrategy.h>
 class AcademicNode:public NodeBase
 {
 public:
@@ -102,7 +96,6 @@ public:
     ~PaperConferenceAuthorGraph();
 
 public:
-    QHash<int, int> mNodeIdHashIndex;
     vector<AcademicNode *> tea;
     void SetTestPos();
     

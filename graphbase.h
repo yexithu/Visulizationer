@@ -35,6 +35,20 @@ public:
     bool isActiveFlag;
 
     void UpDateStrategy(QString strategyName);
+
+    void NodePositionChangeFeedBack(NodeBase *node);
+    void NodeSelectedChangeFeedBack(NodeBase *node);
+    void NodeVisibleChangeFeedBack(NodeBase *node);
+    void FliterByDegree(int degree);
+
+public slots:
+    void FocusOnSelected();
+    void DeFocus();
+
+    void OnShowNodesChecked(int chekstate);
+    void OnShowEdgesChecked(int chekstate);
+
+    void SearchNextLayer();
 private:
     
 protected:
@@ -45,15 +59,17 @@ protected:
     vtkSmartPointer<vtkMutableDirectedGraph> mOriginGraph;
     vtkSmartPointer<vtkGraphLayout> mStoredLayout;
     vtkSmartPointer<vtkGraph> mOutPutGraph;
-    
-    void ConstructOriginGraph();
-    
+    QHash<int, int> mNodeIdHashIndex;
 
+    void ConstructOriginGraph();
     void UpdateViewPort();
     virtual void ConstructScene() = 0;
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+    
+    
 };
 #endif

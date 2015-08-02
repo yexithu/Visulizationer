@@ -2,13 +2,16 @@
 #include <QPainter>
 #include <QDebug>
 #include "GraphDataScene.h"
+#include <QCursor>
 GraphicsNodeItem::GraphicsNodeItem()
 {
-    mRadius = 5;
+    mRadius = 4;
     mPaintColor = QColor(Qt::white);
     this->setFlag(QGraphicsItem::ItemIsMovable, true);
     this->setFlag(QGraphicsItem::ItemIsSelectable, true);
     this->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
+    this->setCursor(QCursor(Qt::PointingHandCursor));
+    /*this->setFlag(QGraphicsItem::ItemSendsSelectedChange, true);*/
 }
 
 GraphicsNodeItem::~GraphicsNodeItem()
@@ -28,13 +31,7 @@ void GraphicsNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     scene()->update();
 }
 
-QVariant GraphicsNodeItem::itemChange(GraphicsItemChange change, const QVariant &value)
+void GraphicsNodeItem::SetNodeColor(QColor color)
 {
-    if (change == ItemScenePositionHasChanged && scene())
-    {
-        //qDebug() << "ItemValueChange";
-            // value is the new position.
-        QPointF newPos = value.toPointF();
-    }
-    return QGraphicsItem::itemChange(change, value);
+    mPaintColor = color;
 }

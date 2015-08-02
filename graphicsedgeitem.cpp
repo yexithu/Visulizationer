@@ -1,8 +1,10 @@
 #include "graphicsedgeitem.h"
+#include <QCursor>
 void GraphicsEdgeItem::setPen(const QPen &pen)
 {
     this->mPaintPen = pen;
     QGraphicsLineItem::setPen(mPaintPen);
+    
 }
 
 GraphicsEdgeItem::GraphicsEdgeItem()

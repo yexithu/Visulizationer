@@ -1,7 +1,10 @@
 #ifndef NODEBASE_H
 #define NODEBASE_H
 #include "graphicsnodeitem.h"
+#include <vector>
+using std::vector;
 class EdgeBase;
+class GraphBase;
 class NodeBase : public GraphicsNodeItem
 {
 public:
@@ -16,11 +19,17 @@ public:
         return temp;
     }
 protected:
+    GraphBase *graphBase;
     int mNodeIndex;
     int mNodeId;
     int mDegree;
-    QColor mPainterColor;
-private:
     vector<EdgeBase *> mConnectedEdges;
+    QColor mPainterColor;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+private:
+    
+    friend class PaperConferenceAuthorGraph;
+    friend class TopicGraph;
+    friend class GraphBase;
 };
 #endif

@@ -1,16 +1,19 @@
 #include "dataviewer.h"
 #include "GraphDataScene.h"
+#include "graphbase.h"
 #include "paperconferenceauthor.h"
+#include "topic.h"
 DataViewer::DataViewer(QWidget *parent)
     :QGraphicsView()
 {
-    this->setDragMode(QGraphicsView::ScrollHandDrag);
+    this->setDragMode(QGraphicsView::RubberBandDrag);
     this->setRenderHint(QPainter::Antialiasing);
+    this->graphScene = NULL;
     QBrush backGround(QColor(15, 15, 15), Qt::BrushStyle::SolidPattern);
     this->setBackgroundBrush(backGround);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
+    //this->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     
     //setCursor(Qt::PointingHandCursor);
 }
@@ -54,12 +57,73 @@ void DataViewer::animFinished()
 
 void DataViewer::LayoutStrategyChanged(QString layoutName)
 {
-    this->paperConferenceAuthorGraph->UpDateStrategy(layoutName);
+    this->graphScene->UpDateStrategy(layoutName);
     
 }
 
 void DataViewer::SetupPaperScene()
 {
-    this->paperConferenceAuthorGraph = new PaperConferenceAuthorGraph(this);
-    setScene(paperConferenceAuthorGraph);
+    if (this->graphScene != NULL)
+    {
+        delete graphScene;
+    }
+    this->graphScene = new PaperConferenceAuthorGraph(this);
+    setScene(graphScene);
+}
+
+void DataViewer::SetupTopicScene()
+{
+    if (this->graphScene != NULL)
+    {
+        delete graphScene;
+    }
+    this->graphScene = new TopicGraph(this);
+    setScene(graphScene);
+}
+
+void DataViewer::enterEvent(QEvent *event)
+{
+
+    QGraphicsView::enterEvent(event);
+}
+
+void DataViewer::mousePressEvent(QMouseEvent *event)
+{
+    /*if (event->button() == Qt::RightButton)
+    {
+        if (this->dragMode() == RubberBandDrag)
+        {
+            setDragMode(ScrollHandDrag);
+            this->mousePressEvent(event);
+        }
+    }
+    */
+    QGraphicsView::mousePressEvent(event);
+}
+
+void DataViewer::mouseReleaseEvent(QMouseEvent *event)
+{
+    /*if (event->button() == Qt::RightButton)
+    {
+        setDragMode(QGraphicsView::RubberBandDrag);
+    }
+    */
+    QGraphicsView::mouseReleaseEvent(event);
+}
+
+
+
+GraphBase * DataViewer::GetScene()
+{
+    return this->graphScene;
+}
+
+void DataViewer::SetHandScrollMode()
+{
+    this->setDragMode(QGraphicsView::ScrollHandDrag);
+}
+
+void DataViewer::SetRubberBandMode()
+{
+    this->setDragMode(QGraphicsView::RubberBandDrag);
 }

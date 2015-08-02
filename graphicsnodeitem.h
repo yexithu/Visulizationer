@@ -29,11 +29,10 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 
-    QColor mPaintColor;
-    GraphDataScene *datascene;
-    
+    QColor mPaintColor;    
+    void SetNodeColor(QColor color);
 protected:
     double mRadius;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    
 };
 #endif

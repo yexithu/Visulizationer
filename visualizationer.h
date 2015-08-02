@@ -19,15 +19,14 @@ public:
 
 private:
     Ui::VisualizationerClass ui;
-    void setVTKWidget();
     void SetUiDetai();
-
-    QAction *paperconAction;
-    QAction *topicAction;
+    void RefreshControlPanel();
 
 private slots:
     void LoadPaperDataset();
     void LoadTopicDataset();
+
+    void FlitterSliderMoved(int value);
 protected:
     void paintEvent(QPaintEvent *pe);
 };

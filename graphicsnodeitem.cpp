@@ -6,7 +6,7 @@
 GraphicsNodeItem::GraphicsNodeItem()
 {
     mRadius = 4;
-    mPaintColor = QColor(Qt::white);
+    //mPaintColor = QColor(Qt::white);
     this->setFlag(QGraphicsItem::ItemIsMovable, true);
     this->setFlag(QGraphicsItem::ItemIsSelectable, true);
     this->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
@@ -25,13 +25,25 @@ QRectF GraphicsNodeItem::boundingRect() const
 
 void GraphicsNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */)
 {
-    painter->setPen(mPaintColor);
-    painter->setBrush(QBrush(mPaintColor, Qt::BrushStyle::SolidPattern));
+    painter->setPen(*mPaintColor);
+    painter->setBrush(QBrush(*mPaintColor, Qt::BrushStyle::SolidPattern));
     painter->drawEllipse(QRectF(QPointF(-mRadius, -mRadius), QPointF(mRadius, mRadius)));
     scene()->update();
 }
 
 void GraphicsNodeItem::SetNodeColor(QColor color)
 {
-    mPaintColor = color;
+    *mPaintColor = color;
+}
+
+
+
+void GraphicsNodeItem::SetSelectedColor()
+{
+    this->mPaintColor = &mSelectedColor;
+}
+
+void GraphicsNodeItem::SetUnselectedColor()
+{
+    this->mPaintColor = &mUnselectedColor;
 }

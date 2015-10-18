@@ -18,14 +18,21 @@ public:
         int mark = 0;
         return temp;
     }
+
+    virtual QString GetDetail() = 0;
 protected:
     GraphBase *graphBase;
     int mNodeIndex;
     int mNodeId;
     int mDegree;
+
     vector<EdgeBase *> mConnectedEdges;
     QColor mPainterColor;
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
+    virtual void SetNodeToolTip() = 0;
+    
 private:
     
     friend class PaperConferenceAuthorGraph;

@@ -27,6 +27,10 @@ private slots:
     void LoadTopicDataset();
 
     void FlitterSliderMoved(int value);
+    void OnFindByDegreeClicked();
+
+   // void OnUpdateNodeDetail(QString detail);
+   // void OnUpdateEdgeDetail(QString detail);
 protected:
     void paintEvent(QPaintEvent *pe);
 };

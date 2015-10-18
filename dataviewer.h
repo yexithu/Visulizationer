@@ -7,12 +7,16 @@ class PaperConferenceAuthorGraph;
 class GraphDataScene;
 class TopicGraph;
 class GraphBase;
+class QTextView;
 class DataViewer : public QGraphicsView
 {
     Q_OBJECT
 public:
     DataViewer(QWidget *parent);
     ~DataViewer();
+
+    QTextView *mEdgeDetailTextView;
+    QTextView *mNodeDetailTextVIew;
 public slots:
     void LayoutStrategyChanged(QString layoutName);
     void SetupPaperScene();

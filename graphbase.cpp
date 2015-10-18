@@ -1,8 +1,10 @@
 #include "graphbase.h"
 #include "edgebase.h"
 #include "nodebase.h"
+#include <QTimeLine>
 #include <QGraphicsView>
 #include <QDebug>
+
 GraphBase::GraphBase(QObject *parent)
     :QGraphicsScene(parent)
 {
@@ -43,65 +45,17 @@ void GraphBase::ConstructOriginGraph()
     mStoredLayout->SetInputData(mOriginGraph);
 }
 
-/* 直接改变位置*/
-
-void GraphBase::UpDateStrategy(QString strategyName)
+int GraphBase::GetHighestDegree()
 {
-    if (strategyName == "Circular")
+    int result = -1;
+    for (NodeBase *node:mNodes)
     {
-        vtkSmartPointer<vtkCircularLayoutStrategy> circularStrategy
-            = vtkSmartPointer<vtkCircularLayoutStrategy>::New();
-        mStoredLayout->SetLayoutStrategy(circularStrategy);
-    }
-    if (strategyName == "ForceDirected")
-    {
-        vtkSmartPointer<vtkForceDirectedLayoutStrategy> forceStrategy
-            = vtkSmartPointer<vtkForceDirectedLayoutStrategy>::New();
-        mStoredLayout->SetLayoutStrategy(forceStrategy);
-    }
-    if (strategyName == "Fast2D")
-    {
-        vtkSmartPointer<vtkFast2DLayoutStrategy> fastStrategy
-            = vtkSmartPointer<vtkFast2DLayoutStrategy>::New();
-        mStoredLayout->SetLayoutStrategy(fastStrategy);
-    }
-
-    mStoredLayout->Update();
-    mOutPutGraph = mStoredLayout->GetOutput();
-    double pos[3];
-    double maxX = -700, minX = 700;
-    double maxY = -700, minY = 700;
-    for (int i = 0; i < mNodeSize; ++i)
-    {
-        //ban flag
-        mNodes[i]->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, false);
-        mOutPutGraph->GetPoint(i, pos);       
-        if (strategyName == "Circular")
+        if (node->mDegree > result)
         {
-            this->mNodes[i]->setX(pos[0] * 300);
-            this->mNodes[i]->setY(pos[1] * 300);
+            result = node->mDegree;
         }
-        if (strategyName == "ForceDirected")
-        {
-            this->mNodes[i]->setX(pos[0] * 600);
-            this->mNodes[i]->setY(pos[1] * 600);
-        }
-        if (strategyName == "Fast2D")
-        {
-            this->mNodes[i]->setX(pos[0] * 200 - 178);
-            this->mNodes[i]->setY(pos[1] * 200 + 35);
-        }
-        mNodes[i]->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
     }
-    qDebug() << "MinMax" << minX<<"  " << maxX << "  " << minY << " " << maxY;
-    for (int i = 0; i < mEdgeSize; ++i)
-    {
-        int *index = mEdges[i]->GetNodeIndex();
-        QPointF source = mNodes[index[0]]->scenePos();
-        QPointF target = mNodes[index[1]]->scenePos();
-
-        mEdges[i]->setLine(QLineF(source, target));
-    }
+    return result;
 }
 
 void GraphBase::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -149,11 +103,11 @@ void GraphBase::NodeSelectedChangeFeedBack(NodeBase *node)
     //qDebug() << "Selected FeedBack" << node->mNodeIndex << node->isSelected();
     if (!node->isSelected())
     {
-        node->SetNodeColor(Qt::red);
+        node->SetSelectedColor();
     }
     else
     {
-        node->SetNodeColor(Qt::white);
+        node->SetUnselectedColor();
     }
     
     for (EdgeBase *edgeBase : node->mConnectedEdges)
@@ -163,23 +117,23 @@ void GraphBase::NodeSelectedChangeFeedBack(NodeBase *node)
         if (mNodes[other]->isSelected() || 
             !mNodes[node->mNodeIndex]->isSelected())
         {
-            edgeBase->setPen(QPen(Qt::red, 0));
+            edgeBase->SetSelectedColor();
         }
         else
         {
-            edgeBase->setPen(QPen(Qt::white,0));
+            edgeBase->SetUnselectedColor();
         }
     }
 }
 
 void GraphBase::NodeVisibleChangeFeedBack(NodeBase *node)
 {
-    qDebug() << "VIsible FeedBack" << node->mNodeIndex << node->isVisible();
+    //qDebug() << "VIsible FeedBack" << node->mNodeIndex << node->isVisible();
     for (EdgeBase *edgeBase : node->mConnectedEdges)
     {
         int *index = edgeBase->GetNodeIndex();
         int other = (index[0] == node->mNodeIndex) ? index[1] : index[0];
-        qDebug() << mNodes[node->mNodeIndex]->isSelected() << "  " << mNodes[other]->isSelected();
+        //qDebug() << mNodes[node->mNodeIndex]->isSelected() << "  " << mNodes[other]->isSelected();
         if (!mNodes[other]->isVisible() ||
             !mNodes[node->mNodeIndex]->isVisible())
         {
@@ -205,6 +159,27 @@ void GraphBase::FliterByDegree(int degree)
             }
         }
         if (node->mDegree >= degree)
+        {
+            if (!node->isSelected())
+            {
+                node->setSelected(true);
+            }
+        }
+    }
+}
+
+void GraphBase::FindByDegree(int value)
+{
+    for (NodeBase * node : mNodes)
+    {
+        if (node->mDegree != value)
+        {
+            if (node->isSelected())
+            {
+                node->setSelected(false);
+            }
+        }
+        else
         {
             if (!node->isSelected())
             {
@@ -249,7 +224,7 @@ void GraphBase::DeFocus()
         if (!node->isVisible())
         {
             node->setVisible(true);
-            //node->setEnabled(true);
+            node->setEnabled(true);
             NodeVisibleChangeFeedBack(node);
         }
     }
@@ -307,4 +282,118 @@ void GraphBase::SearchNextLayer()
             }
         }
     }
+}
+
+
+
+void GraphBase::UpDateStrategy(QString strategyName)
+{
+
+    //存入原来的位置
+    this->mAnimationStartPosition.clear();
+    for (NodeBase *node : mNodes)
+    {
+        node->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, false);
+        mAnimationStartPosition.push_back(node->scenePos());
+    }
+
+    if (strategyName == "Circular")
+    {
+        vtkSmartPointer<vtkCircularLayoutStrategy> circularStrategy
+            = vtkSmartPointer<vtkCircularLayoutStrategy>::New();
+        mStoredLayout->SetLayoutStrategy(circularStrategy);
+    }
+    if (strategyName == "ForceDirected")
+    {
+        vtkSmartPointer<vtkForceDirectedLayoutStrategy> forceStrategy
+            = vtkSmartPointer<vtkForceDirectedLayoutStrategy>::New();
+        mStoredLayout->SetLayoutStrategy(forceStrategy);
+    }
+    if (strategyName == "Fast2D")
+    {
+        vtkSmartPointer<vtkFast2DLayoutStrategy> fastStrategy
+            = vtkSmartPointer<vtkFast2DLayoutStrategy>::New();
+        mStoredLayout->SetLayoutStrategy(fastStrategy);
+    }
+
+    mStoredLayout->Update();
+    mOutPutGraph = mStoredLayout->GetOutput();
+
+
+    UpdateEndPosition(strategyName);
+    QTimeLine *animation = new QTimeLine();
+    animation->setUpdateInterval(50);
+    connect(animation, SIGNAL(valueChanged(qreal)), this, SLOT(OnAnimation(qreal)));
+    connect(animation, SIGNAL(finished()), this, SLOT(OnAnimationEnd()));
+    
+    animation->start();
+}
+
+
+
+
+
+void GraphBase::OnAnimation(qreal value)
+{
+    
+    for (int i = 0; i < mNodeSize; ++i)
+    {
+        QPointF pos = value *mAnimationEndPosition[i] + (1 - value) * mAnimationStartPosition[i];
+        mNodes[i]->setPos(pos);
+    }
+    for (int i = 0; i < mEdgeSize; ++i)
+    {
+        int *index = mEdges[i]->GetNodeIndex();
+        QPointF source = mNodes[index[0]]->scenePos();
+        QPointF target = mNodes[index[1]]->scenePos();
+
+        mEdges[i]->setLine(QLineF(source, target));
+    }
+
+}
+
+void GraphBase::OnAnimationEnd()
+{
+    for (NodeBase *node: mNodes)
+    {
+        node->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
+    }
+    mAnimationEndPosition.clear();
+    mAnimationStartPosition.clear();
+    sender()->~QObject();
+}
+
+void GraphBase::SetSingleColorMode()
+{
+    for (NodeBase *node : mNodes)
+    {
+        node->SetSingleMode();
+    }
+    for (EdgeBase *edge :mEdges)
+    {
+        edge->SetSingleMode();
+    }
+}
+
+void GraphBase::SetMultiColorMode()
+{
+    for (NodeBase *node : mNodes)
+    {
+        node->SetMultiColorMode();
+    }
+    for (EdgeBase *edge : mEdges)
+    {
+        edge->SetMultiColorMode();
+    }
+}
+
+
+void GraphBase::UpdateEdgeDetailTextView(EdgeBase *edge)
+{
+    emit UpdateEdgeDetail(edge->toolTip());
+}
+
+void GraphBase::UpdateNodeDetailTextView(NodeBase *node)
+{
+    emit UpdateNodeDetail(node->GetDetail());
 }

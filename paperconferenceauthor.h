@@ -36,8 +36,12 @@ protected:
     QColor mViewColor;
     QString mViewLable;
     QString mAcademicId;
-    double* mViewLayout;
-    
+    double mViewLayout[3];
+
+    //颜色方案改变
+    virtual void SetSingleMode();
+    virtual void SetMultiColorMode();
+    virtual void SetNodeToolTip();
 };
 
 class PaperNode :public AcademicNode
@@ -46,6 +50,8 @@ public:
     PaperNode(int nodeIndex, int nodeId, Type type, int myear,
         QColor viewColor, QString academicId, QString viewLable, double viewLayout[3]);
     ~PaperNode();
+
+    QString GetDetail();
     friend class PaperConferenceAuthorGraph;
 private:
     QString mAuthors;
@@ -60,6 +66,8 @@ public:
     ConferenceNode(int nodeIndex, int nodeId, Type type, int myear,
         QColor viewColor, QString academicId, QString viewLable, double viewLayout[3]);
     ~ConferenceNode();
+
+    QString GetDetail();
     friend class PaperConferenceAuthorGraph;
 private:
     QString mConferenceName;
@@ -72,6 +80,8 @@ public:
     AuthorNode(int nodeIndex, int nodeId, Type type, int myear,
         QColor viewColor, QString academicId, QString viewLable, double viewLayout[3]);
     ~AuthorNode();
+
+    QString GetDetail();
     friend class PaperConferenceAuthorGraph;
 private:
     QString mAuthorName;
@@ -85,6 +95,12 @@ public:
     ~DirectedEdge();
     friend class PaperConferenceAuthorGraph;
 private:
+protected:
+    //颜色方案改变
+    virtual void SetSingleMode();
+    virtual void SetMultiColorMode();
+
+    virtual void SetEdgeToolTip();
 };
 
 
@@ -96,14 +112,15 @@ public:
     ~PaperConferenceAuthorGraph();
 
 public:
-    vector<AcademicNode *> tea;
     void SetTestPos();
     
 private:
 
     void LoadNodes(QString nodeInFileName);
     void LoadEdges(QString edgeInFileName);
+    void SetDefaultLayout();
 protected:
+    virtual void UpdateEndPosition(QString strategyName);
     virtual void ConstructScene();
 };
 

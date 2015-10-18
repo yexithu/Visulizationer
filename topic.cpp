@@ -1,30 +1,125 @@
 #include "topic.h"
 #include <QDebug>
+
 TopicNode::TopicNode()
 {
     mDocumentIndeces.resize(50);
+
+    //SetMultiColorMode();
+    SetUnselectedColor();
 }
 
 TopicNode::~TopicNode()
 {
 }
 
+void TopicNode::SetSingleMode()
+{
+    mSelectedColor = QColor(182, 43, 30, 255);
+    mUnselectedColor = QColor(96, 96, 96, 200);
+}
+
+void TopicNode::SetMultiColorMode()
+{
+    mSelectedColor = QColor(173, 50, 109);
+    int gradient = this->mDegree * 5 / graphBase->mHighestDegree;
+    if (gradient == 0)
+        mUnselectedColor = QColor(255, 226, 210);
+    if (gradient == 1)
+        mUnselectedColor = QColor(247, 168, 151);
+    if (gradient == 2)
+        mUnselectedColor = QColor(239, 108, 90);
+    if (gradient == 3)
+        mUnselectedColor = QColor(201, 52, 47);
+    if (gradient >= 4)
+        mUnselectedColor = QColor(152, 4, 27);
+}
+
+
+void TopicNode::SetNodeToolTip()
+{
+    QString toolTip;
+    toolTip += "Topic Node\n";
+    toolTip += "ID: " + QString::number(this->mNodeIndex) + "\n";
+    toolTip += "Degree: " + QString::number(this->mDegree);
+    this->setToolTip(toolTip);
+}
+
+QString TopicNode::GetDetail()
+{
+    QString detail;
+    detail.append(this->toolTip() + "\n");
+    detail.append("TopicWord: ");
+    for (QString topicword: mTopicWords)
+    {
+        detail.append(topicword + " ");
+    }
+    detail.append("\n");
+
+    for (int index :mDocumentIndeces)
+    {
+        detail.append(TopicGraph::GetDocument(index));
+    }
+    return detail;
+
+}
+
+
+
 UndirectedEdge::UndirectedEdge()
 {
+    SetMultiColorMode();
+    SetUnselectedColor();
 }
 
 UndirectedEdge::~UndirectedEdge()
 {
 }
 
+void UndirectedEdge::SetSingleMode()
+{
+    mSelectedColor = QColor(46, 105, 153, 255);
+    mUnselectedColor = QColor(96, 96, 96, 200);
+}
+
+void UndirectedEdge::SetMultiColorMode()
+{
+    mSelectedColor = QColor(220, 156, 211, 200);
+    int gradient = this->weight / 0.2;
+    if (gradient == 0)
+        mUnselectedColor = QColor(210, 236, 215);
+    if (gradient == 1)
+        mUnselectedColor = QColor(128, 206, 208);
+    if (gradient == 2)
+        mUnselectedColor = QColor(0, 174, 179);
+    if (gradient == 3)
+        mUnselectedColor = QColor(26, 133, 142);
+    if (gradient >= 4)
+        mUnselectedColor = QColor(14, 92, 104);
+}
+
+
+void UndirectedEdge::SetEdgeToolTip()
+{
+    QString toolTip;
+    int *Id = this->GetNodeId();
+    toolTip += "Wight: " + QString::number(this->weight) + "\n";
+    toolTip += "Node: " + QString::number(Id[0]);
+    toolTip += ", Node: " + QString::number(Id[1]);
+    this->setToolTip(toolTip);
+}
 TopicGraph::TopicGraph(QObject *parent)
     :GraphBase(parent)
 {
     ConstructScene();
 }
 
+
+QFile TopicGraph::mDocumentContentsFile;
+QMap<int, qint64> TopicGraph::mIndexFileIndexMap;
 TopicGraph::~TopicGraph()
 {
+    mDocumentContentsFile.close();
 }
 
 void TopicGraph::ConstructScene()
@@ -34,6 +129,7 @@ void TopicGraph::ConstructScene()
     LoadEdges("GraphData/TopicGraph/Edges.txt");
     LoadDocumentContents("GraphData/TopicGraph/DocumentContent.txt");
 
+    this->mHighestDegree = GetHighestDegree();
     //add to scene
     ConstructOriginGraph();
     UpDateStrategy("Circular");
@@ -45,12 +141,15 @@ void TopicGraph::ConstructScene()
         QPointF target = mNodes[index[1]]->scenePos();
 
         mEdges[i]->setLine(QLineF(source, target));
+        mEdges[i]->SetEdgeToolTip();
+        mEdges[i]->SetMultiColorMode();
         this->addItem(mEdges[i]);
-        qDebug() << source << target;
     }
     for (int i = 0; i < mNodeSize; ++i)
     {
         this->addItem(mNodes[i]);
+        mNodes[i]->SetNodeToolTip();
+        mNodes[i]->SetMultiColorMode();
        // qDebug() << mNodes[i]->mNodeId;
     }
 }
@@ -122,6 +221,7 @@ void TopicGraph::LoadEdges(QString edgeInFileName)
         }
         target = numberList[1].toInt();
         UndirectedEdge *edge = new UndirectedEdge;
+        edge->graphBase = this;
         edge->weight = numberList[2].toDouble();
         edge->mEdgeIndex = index;
         edge->mNodeId[0] = source;
@@ -173,6 +273,43 @@ void TopicGraph::LoadDocumentContents(QString documentInFileName)
     buffer = mDocumentContentsFile.readLine(98611);
     qDebug() << buffer;*/
 
-    int breakMark = 0;
+}
+QString TopicGraph::GetDocument(int index)
+{
+    QString document, buffer;
+    mDocumentContentsFile.seek(mIndexFileIndexMap.value(19));
+    buffer = mDocumentContentsFile.readLine();
+    document.append(buffer + "\n");
+    buffer = mDocumentContentsFile.readLine();
+    document.append(buffer + "\n");
+   
+    return document;
+}
+void TopicGraph::UpdateEndPosition(QString strategyName)
+{
+    double pos[3];
+    mAnimationEndPosition.clear();
+    for (int i = 0; i < mNodeSize; ++i)
+    {
+        QPointF endPos;
+        //ban flag
 
+        mOutPutGraph->GetPoint(i, pos);
+        if (strategyName == "Circular")
+        {
+            endPos.setX(pos[0] * 300);
+            endPos.setY(pos[1] * 300);
+        }
+        if (strategyName == "ForceDirected")
+        {
+            endPos.setX(pos[0] * 600);
+            endPos.setY(pos[1] * 600);
+        }
+        if (strategyName == "Fast2D")
+        {
+            endPos.setX(pos[0] * 34 - 17);
+            endPos.setY(pos[1] * 44 + 14.3);
+        }
+        mAnimationEndPosition.push_back(endPos);
+    }
 }

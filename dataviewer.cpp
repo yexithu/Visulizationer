@@ -14,7 +14,7 @@ DataViewer::DataViewer(QWidget *parent)
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     //this->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
-    
+    mNumScheduledScalings = 0;
     //setCursor(Qt::PointingHandCursor);
 }
 

@@ -34,6 +34,7 @@ void Visualizationer::SetUiDetai()
     ui.layoutComboBox->addItem("Circular");
     ui.layoutComboBox->addItem("Fast2D");
     ui.layoutComboBox->addItem("ForceDirected");
+    
     connect(ui.layoutComboBox, SIGNAL(activated(const QString &)), ui.dataViewer, SLOT(LayoutStrategyChanged(QString)));
 
 
@@ -51,9 +52,14 @@ void Visualizationer::SetUiDetai()
     connect(ui.drugRadioButton, SIGNAL(toggled(bool)), ui.dataViewer, SLOT(SetHandScrollMode()));
     connect(ui.selectRadioButton, SIGNAL(toggled(bool)), ui.dataViewer, SLOT(SetRubberBandMode()));
     
+    //set find button
+    connect(ui.findButton, SIGNAL(clicked()), this, SLOT(OnFindByDegreeClicked()));
 
-    
-
+    //set textBrower
+    qApp->setStyleSheet("QTextBrowser{background - color: rgb(62, 62, 62);}");
+    ui.edgeTextBrowser->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //ui.edgeTextBrowser->setStyleSheet("background - color: rgb(62, 62, 62); ");
+    ui.nodeTextBrowser->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     //set panel disable
     this->ui.ControlPanel->setDisabled(true);
 
@@ -80,8 +86,10 @@ void Visualizationer::RefreshControlPanel()
     ui.ControlPanel->setDisabled(false);
     ui.layoutComboBox->setCurrentIndex(0);
     ui.horizontalSlider->setValue(0);
+    ui.horizontalSlider->setRange(0, ui.dataViewer->GetScene()->mHighestDegree);
+    ui.fillterDial->setRange(0, ui.dataViewer->GetScene()->mHighestDegree);
     
-    ui.singleRadioButton->setChecked(true);
+    ui.multiRadioButton->setChecked(true);
 
     ui.showNodesBox->setChecked(true);
     ui.showEdgesBox->setChecked(true);
@@ -96,7 +104,16 @@ void Visualizationer::RefreshControlPanel()
 
     //set the searchButtom
     connect(ui.searchPushButton, SIGNAL(clicked()), ui.dataViewer->GetScene(), SLOT(SearchNextLayer()));
-    int brakMark = 10;
+
+    //set the color buttom
+    connect(ui.singleRadioButton, SIGNAL(toggled(bool)), ui.dataViewer->GetScene(), SLOT(SetSingleColorMode()));
+    connect(ui.multiRadioButton, SIGNAL(toggled(bool)), ui.dataViewer->GetScene(), SLOT(SetMultiColorMode()));
+    
+    //set update detial
+    connect(ui.dataViewer->GetScene(), SIGNAL(UpdateNodeDetail(QString)),
+        ui.nodeTextBrowser, SLOT(setText(const QString&)));
+    connect(ui.dataViewer->GetScene(), SIGNAL(UpdateEdgeDetail(QString)),
+        ui.edgeTextBrowser, SLOT(setText(const QString&)));
 }
 
 void Visualizationer::FlitterSliderMoved(int value)
@@ -108,3 +125,8 @@ void Visualizationer::FlitterSliderMoved(int value)
     qDebug() << "Horizontal Move";
 }
 
+
+void Visualizationer::OnFindByDegreeClicked()
+{
+    ui.dataViewer->GetScene()->FindByDegree(this->ui.searchSpinBox->value());
+}

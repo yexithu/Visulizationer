@@ -4,6 +4,7 @@
 NodeBase::NodeBase()
 {
     mDegree = 0;
+    setAcceptHoverEvents(true);
 }
 
 NodeBase::~NodeBase()
@@ -30,4 +31,13 @@ QVariant NodeBase::itemChange(GraphicsItemChange change, const QVariant &value)
         this->graphBase->NodeVisibleChangeFeedBack(this);
     }*/
     return QGraphicsItem::itemChange(change, value);
+}
+
+void NodeBase::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->button() == Qt::MouseButton::RightButton)
+    {
+        graphBase->UpdateNodeDetailTextView(this);
+    }
+    GraphicsNodeItem::mousePressEvent(event);
 }

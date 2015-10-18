@@ -1,7 +1,8 @@
 #ifndef EDGEBASE_H
 #define EDGEBASE_H
 #include "graphicsedgeitem.h"
-
+#include <QTimeLine>
+class GraphBase;
 class EdgeBase :public GraphicsEdgeItem
 {
 public:
@@ -22,8 +23,15 @@ protected:
     int mNodeId[2];
     int mNodeIndex[2];
 
-private:
+    GraphBase *graphBase;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
+    virtual void SetEdgeToolTip() = 0;
+
+private:
+    friend class GraphBase;
+    friend class TopicGraph;
+    friend class PaperConferenceAuthorGraph;
 };
 
 #endif
